@@ -9,7 +9,7 @@
     <ion-card-content>
       <form (ngSubmit)="login()" [formGroup]="credentials">
         <ion-input label="Your email" label-placement="floating" placeholder="Enter email" type="email" inputmode="email" formControlName="email" />
-        <ion-input label="Your email" label-placement="floating" placeholder="Password" type="password" inputmode="password" formControlName="password" />
+        <ion-input label="Password" label-placement="floating" placeholder="Password" type="password" inputmode="password" formControlName="password" />
         <ion-button type="submit" expand="block" [disabled]="credentials.invalid">
           Submit
         </ion-button>

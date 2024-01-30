@@ -1,13 +1,39 @@
-<ion-header [translucent]="true">
+<ion-header>
   <ion-toolbar>
     <ion-title>register</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">register</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <ion-card>
+    <ion-card-content>
+      <form (ngSubmit)="signUp()" [formGroup]="credentials">
+        <ion-input label="Your name" label-placement="floating" type="text" inputmode="text" formControlName="name" />
+        <ion-input label="Your email" label-placement="floating" type="email" inputmode="email" formControlName="email" />
+        <ion-input label="Password" label-placement="floating" type="password" inputmode="password" formControlName="password" />
+        <ion-button type="submit" expand="block" [disabled]="credentials.invalid">
+          Submit
+        </ion-button>
+      </form>
+      <div class="ion-margin-top">
+        <ion-button expand="block" fill="outline" (click)="getMagicLink()">
+          <ion-icon name="mail-outline" slot="start" />
+          Get link
+        </ion-button>
+        <ion-button expand="block" fill="outline" (click)="withGoogle()">
+          <ion-icon icon="logo-google" slot="start" />
+          Google
+        </ion-button>
+        <ion-button expand="block" fill="outline" (click)="withFacebook()">
+          <ion-icon name="logo-facebook" slot="start" />
+          Facebook
+        </ion-button>
+        <ion-button fill="outline" routerLink="">
+          <ion-icon icon="arrow-back-outline" slot="start" />
+          Back to login
+        </ion-button>
+      </div>
+
+    </ion-card-content>
+  </ion-card>
 </ion-content>

@@ -11,8 +11,8 @@ import { AuthService } from 'src/app/services/auth.service';
 })
 export class LoginPage implements OnInit {
   credentials = this.formBuilder.nonNullable.group({
-    email: ['zgaya@hub.com', [Validators.required, Validators.email]],
-    password: ['123456', Validators.required],
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', Validators.required],
   });
 
   constructor(
