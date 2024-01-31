@@ -56,7 +56,6 @@ export class AuthService {
   async googleAuth() {
     return this.supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { skipBrowserRedirect: true },
     });
   }
 
@@ -76,7 +75,7 @@ export class AuthService {
     this.router.navigateByUrl('/', { replaceUrl: true });
   }
 
-  async getCurrentUser(): Promise<Observable<User | boolean>> {
+  getCurrentUser(): Observable<User | boolean> {
     return this.currentUser.asObservable();
   }
 

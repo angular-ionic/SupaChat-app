@@ -11,8 +11,8 @@ import { AuthService } from 'src/app/services/auth.service';
 })
 export class LoginPage implements OnInit {
   credentials = this.formBuilder.nonNullable.group({
-    email: ['', [Validators.required, Validators.email]],
-    password: ['', Validators.required],
+    email: ['zeshan@gmail.com', [Validators.required, Validators.email]],
+    password: ['password', Validators.required],
   });
 
   constructor(
@@ -21,7 +21,14 @@ export class LoginPage implements OnInit {
     private loadingController: LoadingController,
     private alertController: AlertController,
     private router: Router
-  ) {}
+  ) {
+    this.authService.getCurrentUser().subscribe((user) => {
+      if (user) {
+        console.log('USER ON LOGIN PAGE', user);
+        this.router.navigateByUrl('/groups');
+      }
+    });
+  }
 
   get email() {
     return this.credentials.controls.email;
@@ -55,18 +62,93 @@ export class LoginPage implements OnInit {
   }
 
   async getMagicLink() {
-    console.log(this.credentials.controls.email);
+    await (
+      await this.alertController.create({
+        header: 'Get a magic link',
+        message: 'We will send you a link to magically login!',
+        inputs: [
+          {
+            type: 'email',
+            name: 'email',
+          },
+        ],
+        buttons: [
+          {
+            text: 'Cancel',
+            role: 'cancel',
+          },
+          {
+            text: 'Get magic link',
+            handler: async (result) => {
+              const loading = await this.loadingController.create();
+              await loading.present();
+              const { error } = await this.authService.signInWithEmail(
+                result.email
+              );
+              await loading.dismiss();
+
+              if (error) {
+                this.showAlert('Failed', error.message);
+              } else {
+                this.showAlert('Success', 'Please check your emails!');
+              }
+            },
+          },
+        ],
+      })
+    ).present();
   }
 
   async forgotPassword() {
-    console.log(this.credentials.controls.email);
+    await (
+      await this.alertController.create({
+        header: 'Receive a new password',
+        message: 'Please insert your email',
+        inputs: [
+          {
+            type: 'email',
+            name: 'email',
+          },
+        ],
+        buttons: [
+          {
+            text: 'Cancel',
+            role: 'cancel',
+          },
+          {
+            text: 'Reset password',
+            handler: async (result) => {
+              const loading = await this.loadingController.create();
+              await loading.present();
+              const { error } = await this.authService.sendPasswordReset(
+                result.email
+              );
+              await loading.dismiss();
+
+              if (error) {
+                this.showAlert('Failed', error.message);
+              } else {
+                this.showAlert('Success', 'Please check your emails!');
+              }
+            },
+          },
+        ],
+      })
+    ).present();
   }
 
   async withFacebook() {
-    console.log(this.credentials.controls.email);
+    const result = await this.authService.facebookAuth();
+    if (result.error) {
+      this.showAlert(result.error.name, result.error.message);
+    }
   }
+
   async withGoogle() {
-    console.log(this.credentials.controls.email);
+    const result = await this.authService.googleAuth();
+    if (result.error) {
+      this.showAlert(result.error.name, result.error.message);
+    }
   }
 
   ngOnInit() {}
