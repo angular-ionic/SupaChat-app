@@ -14,11 +14,11 @@
 
 <ion-content>
 
-  <ion-list *ngFor="let item of groups">
-    <ion-item routerLink="[group.id]">
+  <ion-list *ngFor="let group of groups">
+    <ion-item [routerLink]="[group.id]">
       <ion-label>
-        {{item.title}}
-        <p>{{item.users.email}}</p>
+        {{group.title}}
+        <p>{{group.users.email}}</p>
       </ion-label>
     </ion-item>
 

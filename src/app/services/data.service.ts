@@ -6,6 +6,7 @@ import {
 } from '@supabase/supabase-js';
 import { Subject } from 'rxjs';
 import { environment } from 'src/environments/environment';
+import { IGroup } from '../page/messages/types';
 
 export interface IMessage {
   created_at: string;
@@ -20,7 +21,7 @@ export interface IMessage {
 })
 export class DataService {
   private supabase: SupabaseClient;
-  private realTimeChannel: RealtimeChannel;
+  private realTimeChannel: RealtimeChannel | undefined;
 
   constructor() {
     this.supabase = createClient(
@@ -36,13 +37,13 @@ export class DataService {
       .then((data) => data.data);
   }
 
-  async getGroupById(id: number) {
-    return this.supabase
+  async getGroupById(id: number): Promise<IGroup> {
+    return (await this.supabase
       .from(GROUPS_DB)
       .select('created_at, title, id, users:creator( email, id )')
       .match({ id })
       .single()
-      .then((data) => data.data);
+      .then((data) => data.data)) as IGroup;
   }
 
   async createGroup(title: string) {
@@ -61,16 +62,17 @@ export class DataService {
     };
     return this.supabase.from(MESSAGES_DB).insert(newMessage);
   }
+
   async getGroupMessages(groupId: number) {
     return this.supabase
-      .from(GROUPS_DB)
+      .from(MESSAGES_DB)
       .select('created_at, text, id, users:user_id ( email, id )')
       .match({ group_id: groupId })
       .limit(25)
       .then((data) => data.data);
   }
 
-  listenToGroup() {
+  listenToGroup(groupId: number) {
     const subject = new Subject();
 
     this.realTimeChannel = this.supabase.channel('public:messages').on(
@@ -78,9 +80,19 @@ export class DataService {
       {
         event: '*',
       },
-      (payload) => {
-        console.log(payload);
-        subject.next(payload);
+      async (payload: any) => {
+        if (payload.new && (payload.new as IMessage).group_id === groupId) {
+          const msgId = payload.new.id;
+          console.log('load message: ', msgId);
+
+          const msg = await this.supabase
+            .from(MESSAGES_DB)
+            .select(`created_at, text, id, users:user_id ( email, id )`)
+            .match({ id: msgId })
+            .single()
+            .then((result) => result.data);
+          subject.next(msg);
+        }
       }
     );
 

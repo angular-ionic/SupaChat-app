@@ -1,10 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import {
-  AlertController,
-  LoadingController,
-  NavController,
-} from '@ionic/angular';
+import { AlertController, LoadingController } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth.service';
 import { DataService } from 'src/app/services/data.service';
 
@@ -13,7 +9,7 @@ import { DataService } from 'src/app/services/data.service';
   templateUrl: './groups.page.html',
   styleUrls: ['./groups.page.scss'],
 })
-export class GroupsPage implements OnInit {
+export class GroupsPage {
   user = this.authService.getCurrentUser();
   groups: any = [];
 
@@ -21,7 +17,6 @@ export class GroupsPage implements OnInit {
     private authService: AuthService,
     private router: Router,
     private alertController: AlertController,
-    private navController: NavController,
     private loadingController: LoadingController,
     private dataService: DataService
   ) {}
@@ -29,7 +24,7 @@ export class GroupsPage implements OnInit {
   async ionViewWillEnter() {
     const result = await this.dataService.getGroups();
     console.log(result);
-    
+
     if (result) {
       this.groups = result;
     }
@@ -86,6 +81,4 @@ export class GroupsPage implements OnInit {
   async signOut() {
     await this.authService.signOut();
   }
-
-  ngOnInit() {}
 }
