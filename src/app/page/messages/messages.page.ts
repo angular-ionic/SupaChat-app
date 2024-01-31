@@ -24,16 +24,10 @@ export class MessagesPage implements OnInit, OnDestroy {
   ) {}
 
   async sendMessage() {
-    const s = await this.dataService.addGroupMessage(
-      this.group?.id!,
-      this.messageText
-    );
-    console.log(s.error);
-
+    await this.dataService.addGroupMessage(this.group?.id!, this.messageText);
     this.messageText = '';
   }
-  
-  
+
   async ngOnInit() {
     const loading = await this.loadingController.create({
       message: 'Load messages...',
@@ -44,9 +38,7 @@ export class MessagesPage implements OnInit, OnDestroy {
       this.currentUserId = this.authService.getCurrentUserId();
       this.group = await this.dataService.getGroupById(+groupId);
       const messages = await this.dataService.getGroupMessages(+groupId)!;
-      console.log(messages);
       if (messages) this.messages = messages;
-
       this.dataService.listenToGroup(+groupId).subscribe((msg) => {
         console.log('GOT NEW MESSAGE: ' + messages);
       });

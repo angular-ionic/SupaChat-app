@@ -6,15 +6,7 @@ import {
 } from '@supabase/supabase-js';
 import { Subject } from 'rxjs';
 import { environment } from 'src/environments/environment';
-import { IGroup } from '../page/messages/types';
-
-export interface IMessage {
-  created_at: string;
-  group_id: number;
-  id: number;
-  text: string;
-  user_id: string;
-}
+import { IGroup, IMessage } from '../page/messages/types';
 
 @Injectable({
   providedIn: 'root',
@@ -63,13 +55,16 @@ export class DataService {
     return this.supabase.from(MESSAGES_DB).insert(newMessage);
   }
 
-  async getGroupMessages(groupId: number) {
-    return this.supabase
+  async getGroupMessages(groupId: number): Promise<IMessage[]> {
+    const result = await this.supabase
       .from(MESSAGES_DB)
-      .select('created_at, text, id, users:user_id ( email, id )')
+      .select('created_at, text, id, users:user_id(email,id)')
       .match({ group_id: groupId })
-      .limit(25)
-      .then((data) => data.data);
+      .order('created_at', { ascending: false })
+      .limit(25);
+    return result.data! as unknown as IMessage[];
+
+    // .then((data) => data.data as[]!);
   }
 
   listenToGroup(groupId: number) {
