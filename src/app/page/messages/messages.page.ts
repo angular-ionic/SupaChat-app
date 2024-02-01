@@ -35,12 +35,12 @@ export class MessagesPage implements OnInit, OnDestroy {
     loading.present();
     const groupId = this.route.snapshot.paramMap.get('groupId');
     if (groupId) {
-      this.currentUserId = this.authService.getCurrentUserId();
+      // this.currentUserId = this.authService.getCurrentUserId();
       this.group = await this.dataService.getGroupById(+groupId);
       const messages = await this.dataService.getGroupMessages(+groupId)!;
       if (messages) this.messages = messages;
       this.dataService.listenToGroup(+groupId).subscribe((msg) => {
-        console.log('GOT NEW MESSAGE: ' + messages);
+        this.messages.push(msg as IMessage);
       });
     }
 
